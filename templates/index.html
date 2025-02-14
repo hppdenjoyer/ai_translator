@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Translator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .container {
+            display: flex;
+            gap: 20px;
+        }
+        textarea {
+            width: 100%;
+            height: 200px;
+            margin: 10px 0;
+            padding: 10px;
+        }
+        select {
+            padding: 5px;
+            margin: 5px 0;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <h1>AI Translator</h1>
+    <div class="container">
+        <div style="flex: 1;">
+            <select id="sourceLanguage">
+                <option value="English">English</option>
+                <option value="Russian">Russian</option>
+                <option value="Spanish">Spanish</option>
+                <option value="French">French</option>
+                <option value="German">German</option>
+            </select>
+            <textarea id="sourceText" placeholder="Enter text to translate..."></textarea>
+        </div>
+        <div style="flex: 1;">
+            <select id="targetLanguage">
+                <option value="Russian">Russian</option>
+                <option value="English">English</option>
+                <option value="Spanish">Spanish</option>
+                <option value="French">French</option>
+                <option value="German">German</option>
+            </select>
+            <textarea id="translatedText" readonly placeholder="Translation will appear here..."></textarea>
+        </div>
+    </div>
+
+    <div style="margin-top: 20px;">
+        <label for="style">Translation Style:</label>
+        <select id="style">
+            <option value="formal">Formal</option>
+            <option value="informal">Informal</option>
+            <option value="business">Business Email</option>
+            <option value="flirt">Flirt</option>
+        </select>
+    </div>
+
+    <button onclick="translateText()">Translate</button>
+
+    <script>
+        async function translateText() {
+            const sourceText = document.getElementById('sourceText').value;
+            const sourceLanguage = document.getElementById('sourceLanguage').value;
+            const targetLanguage = document.getElementById('targetLanguage').value;
+            const style = document.getElementById('style').value;
+
+            try {
+                const response = await fetch('http://localhost:8000/translate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        text: sourceText,
+                        source_language: sourceLanguage,
+                        target_language: targetLanguage,
+                        style: style
+                    })
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    document.getElementById('translatedText').value = data.translated_text;
+                } else {
+                    alert('Translation failed: ' + data.detail);
+                }
+            } catch (error) {
+                alert('Error: ' + error.message);
+            }
+        }
+    </script>
+</body>
+</html>
